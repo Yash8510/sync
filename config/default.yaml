@@ -1,0 +1,13 @@
+app:
+  name: "local-assistant"
+
+logging:
+  level: "INFO"
+  file: log/assistant.log
+
+speech:
+  sample_rate: 16000
+  chunk_size: 4096
+  buffer_seconds: 5
+  piper_path: "bin/piper/piper.exe"
+  piper_model_path: "models/tts/en_US-amy-medium.onnx"
