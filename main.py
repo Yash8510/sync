@@ -96,7 +96,18 @@ def main():
     bg_thread.start()
     logger.info("Background threaded voice loop started successfully")
 
-    app.exec()
+    # Start PyQt eventloop
+    exit_code = app.exec()
+
+    # cleanup on exit
+    logger.info("=== Shutting Down App ===")
+    event_bridge._unsubscribe_all()  # unsubscribe all events
+
+    # stop background thread loop and wait for thread to exit
+    bg_loop.call_soon_threadsafe(bg_loop.stop)
+    bg_thread.join(timeout=3)
+    logger.info("Main loop terminated, exiting")
+    sys.exit(exit_code)
 
 
 if __name__ == "__main__":
