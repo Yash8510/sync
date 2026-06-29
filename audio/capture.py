@@ -57,7 +57,7 @@ class AudioCapture:
                 channels=1,
                 blocksize=self.chunk_size,
                 callback=audio_callback,
-                latency="low"
+                latency=0.1
             )
             self._stream.start()
             logger.info("Audio capture started")
@@ -78,10 +78,27 @@ class AudioCapture:
             self._stream = None
         logger.info("Audio capture stopped")
 
-    def get_buffered_audio(self) -> np.ndarray:
-        """Return all audio in a single array"""
+    def get_recent_audio(self, num_samples: int) -> np.ndarray:
+        """Return the most recent `num_samples` audio samples efficiently without concatenating the whole buffer"""
         with self._lock:
             if not self.buffer:
                 return np.empty(0, dtype=np.float32)
-            buffer_list = list(self.buffer)
-        return np.concatenate(buffer_list)
+            
+            chunks_needed = []
+            samples_accumulated = 0
+            
+            # Traverse the deque backwards to gather just enough chunks
+            for chunk in reversed(self.buffer):
+                chunks_needed.append(chunk)
+                samples_accumulated += len(chunk)
+                if samples_accumulated >= num_samples:
+                    break
+            
+            # Restore chronological order
+            chunks_needed.reverse()
+            
+            if not chunks_needed:
+                return np.empty(0, dtype=np.float32)
+                
+            concatenated = np.concatenate(chunks_needed)
+            return concatenated[-num_samples:]
