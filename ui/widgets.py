@@ -25,7 +25,7 @@ class FloatingOrb(QWidget):
             Qt.WindowType.Tool
         )
 
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, False)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
 
         self.drag_position = QPoint()
 
@@ -44,8 +44,8 @@ class FloatingOrb(QWidget):
         self.fft_bands = [0.0] * 16
         self.smooth_fft_bands = [0.0] * 16
 
-        # Optimization: Precompute circle coordinates (60 steps is perfect for distinct points)
-        self.steps = 60
+        # Optimization: Precompute circle coordinates
+        self.steps = 200
         self.trig_cache = []
         for i in range(self.steps):
             theta = (i / self.steps) * 2 * math.pi
@@ -95,24 +95,30 @@ class FloatingOrb(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
+        # Dynamic center coordinates based on self.size
         cx = self.size[0] / 2
         cy = self.size[1] / 2
 
-        # 1. Background glow (Deep Royal/Neon Blue vignette - boosted saturation and brightness)
-        bg_grad = QRadialGradient(cx, cy, self.size[0] / 2)  # center gradient color
+        # Base scale factor relative to the design dimension of 200px
+        base_dim = min(self.size[0], self.size[1])
+        scale = base_dim / 200.0
+
+        # 1. Background glow (Deep Royal/Neon Blue vignette - dynamically scaled)
+        bg_radius = 90.0 * scale
+        bg_grad = QRadialGradient(cx, cy, bg_radius)
         bg_grad.setColorAt(0.0, QColor(0, 102, 255, int(60 + 80 * self.current_audio_level)))  # Saturated Neon Blue center
         bg_grad.setColorAt(0.6, QColor(0, 25, 120, int(20 + 35 * self.current_audio_level)))   # Vivid deep blue
         bg_grad.setColorAt(1.0, QColor(0, 0, 0, 0))
         painter.setBrush(bg_grad)
         painter.setPen(Qt.PenStyle.NoPen)
-        painter.drawEllipse(QPointF(cx, cy), 96.0, 96.0)
+        painter.drawEllipse(QPointF(cx, cy), 96.0 * scale, 96.0 * scale)
 
-        # 2. Outer Wavy Particle Rings (Boosted base opacity for maximum visibility)
+        # 2. Outer Wavy Particle Rings (Dynamically scaled radius and amplitude)
         wave_configs = [
             # radius, freq, amp, phase_offset, level (Bass/Mid/Treble), alpha
-            (76.0, 5, 0.5 + 18.0 * self.current_bass_level, self.phase, self.current_bass_level, 255), # Fully solid base
-            (80.0, 7, 0.5 + 14.0 * self.current_mid_level, -self.phase * 1.3, self.current_mid_level, 210),
-            (84.0, 4, 0.5 + 10.0 * self.current_treble_level, self.phase * 0.8, self.current_treble_level, 170)
+            (76.0 * scale, 5, (0.5 + 18.0 * self.current_bass_level) * scale, self.phase, self.current_bass_level, 255), # Fully solid base
+            (80.0 * scale, 7, (0.5 + 14.0 * self.current_mid_level) * scale, -self.phase * 1.3, self.current_mid_level, 204),
+            (84.0 * scale, 4, (0.5 + 10.0 * self.current_treble_level) * scale, self.phase * 0.8, self.current_treble_level, 170)
         ]
 
         # Slowly rotate the circular gradient around the center to make colors cycle
@@ -131,15 +137,16 @@ class FloatingOrb(QWidget):
             gradient = QConicalGradient(cx, cy, gradient_angle)
             
             # Keep minimum opacity very high (80%) so colors look thick and visible even in quiet states
-            alpha_val = int(alpha * (0.8 + 0.2 * reactivity))
+            alpha_val = int(alpha * (0.7 + 0.3 * reactivity))
             gradient.setColorAt(0.0, QColor(0, 255, 255, alpha_val))   # Solid Cyan
             gradient.setColorAt(0.25, QColor(0, 150, 255, alpha_val))  # Vivid Blue
             gradient.setColorAt(0.5, QColor(100, 30, 255, alpha_val))  # Vivid Purple-Indigo
             gradient.setColorAt(0.75, QColor(0, 150, 255, alpha_val))  # Vivid Blue
             gradient.setColorAt(1.0, QColor(0, 255, 255, alpha_val))   # Solid Cyan
 
-            # Thicker pen (3.5px instead of 1.5px) for bolder, more visible particle rings
-            pen = QPen(QBrush(gradient), 3.5)
+            # Scale the pen thickness dynamically (base thickness is 3.5px)
+            pen_width = max(1.0, 3.5 * scale)
+            pen = QPen(QBrush(gradient), pen_width)
             painter.setPen(pen)
             painter.drawPoints(points)
 
