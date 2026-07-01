@@ -2,6 +2,8 @@
 main assistant entry point
 """
 
+import torch  # pre-import torch to avoid getting DLL collision error with PyQt6
+
 import asyncio
 import logging
 import sys
@@ -54,7 +56,7 @@ def start_async_loop(loop, pipeline):
 
 
 def main():
-    # starting app
+    # app instance
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(True)  # minimize window when closed
 
@@ -63,15 +65,20 @@ def main():
     config_logging(config.log_level, str(config.raw.get("logging").get("file")))
     logger.info("=== Starting assistant application ===")
 
+    # <----------loadup the important things first---------->
+    # 1. Initialize EventBus
+    # 2. Audio Pipeline Orchestrator instantiation
+    # 3. Initialize PyQt Event Bridge
+    # 4. Setup Main Window Instance
+
     # initializing eventbus
     event_bus = EventBus()
 
-    # starting background async loop
+    # background async loop instanced
     bg_loop = asyncio.new_event_loop()
 
     # audio pipeline orchestrator
     speech_cfg = config.raw.get("speech")
-
     pipeline = AudioSpeechPipeline(
         event_bus=event_bus,
         speech_cfg=speech_cfg
@@ -80,13 +87,16 @@ def main():
     # setup event bridge
     event_bridge = PyQtEventBridge(event_bus)
 
-    # window setiup and show
+    # window setup and show
     window = MainWindow(
         event_bridge,
         audio_capture=pipeline.capture
     )
     window.show()  # display window
-    
+    # <----------END---------->
+
+
+    # <----------Starting background worker thread and PyQt eventloop---------->
     # start background worker thread to run asyncio event loop
     bg_thread = threading.Thread(
         target=start_async_loop,
@@ -98,7 +108,10 @@ def main():
 
     # Start PyQt eventloop
     exit_code = app.exec()
+    # <----------END---------->
 
+
+    # <----------Safely cleaning up and shutting down the assistant---------->
     # cleanup on exit
     logger.info("=== Shutting Down App ===")
     event_bridge._unsubscribe_all()  # unsubscribe all events
@@ -108,6 +121,7 @@ def main():
     bg_thread.join(timeout=3)
     logger.info("Main loop terminated, exiting")
     sys.exit(exit_code)
+    # <----------END---------->
 
 
 if __name__ == "__main__":

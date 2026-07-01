@@ -10,6 +10,7 @@ import numpy as np
 import queue as _queue
 
 from audio.capture import AudioCapture
+from audio.vad import VADDectector
 from core.event_bus import EventBus
 
 logger = logging.getLogger(__name__)
@@ -26,6 +27,7 @@ class AudioSpeechPipeline:
         self.capture = AudioCapture(sample_rate=speech_cfg.get("sample_rate"),
                                     chunk_size=speech_cfg.get("chunk_size"),
                                     buffer_seconds=speech_cfg.get("buffer_seconds"))
+        self.vad = VADDectector(sample_rate=speech_cfg.get("sample_rate"))
         self._is_running = False
 
         # thread-safe queue to pass audio chunk from callback func which is consumed by get_user_utterance()
