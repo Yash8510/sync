@@ -46,13 +46,25 @@ async def run_pipeline(pipeline: AudioSpeechPipeline) -> None:
         logger.exception("Error in background voice pipeline: %s", e)
 
 
-def start_async_loop(loop, pipeline):
+def start_async_loop(loop: asyncio.AbstractEventLoop, pipeline: AudioSpeechPipeline):
     """Entry point for background worker thread"""
     asyncio.set_event_loop(loop)
     try:
         loop.run_until_complete(run_pipeline(pipeline))
     except Exception as e:
         logger.error("Async worker thread encountered error: %s", e)
+    finally:
+        try:
+            pending = asyncio.all_tasks(loop)
+            if pending:
+                for task in pending:
+                    task.cancel()
+                loop.run_until_complete(asyncio.gather(*pending, return_exceptions=True))
+            loop.run_until_complete(loop.shutdown_asyncgens())
+        except Exception as e:
+            logger.error("Error during asyncio loop shutdown: %s", e)
+        finally:
+            loop.close()
 
 
 def main():
@@ -116,8 +128,12 @@ def main():
     logger.info("=== Shutting Down App ===")
     event_bridge._unsubscribe_all()  # unsubscribe all events
 
-    # stop background thread loop and wait for thread to exit
-    bg_loop.call_soon_threadsafe(bg_loop.stop)
+    # cancel all tasks in the background loop thread-safely
+    def cancel_tasks():
+        for task in asyncio.all_tasks(bg_loop):
+            task.cancel()
+
+    bg_loop.call_soon_threadsafe(cancel_tasks)
     bg_thread.join(timeout=3)
     logger.info("Main loop terminated, exiting")
     sys.exit(exit_code)

@@ -48,7 +48,7 @@ class VADDectector:
             # slicind window of exactly '_frame_size' samples across the chunk
             for start in range(0, len(audio) - self._frame_size + 1, self._frame_size):
                 frame = audio[start : start + self._frame_size]
-                prob = self.model(torch.from_numpy(frame).float(), self._frame_size).item()
+                prob = self.model(torch.from_numpy(frame).float(), self.sample_rate).item()
                 if prob > max_prob:
                     max_prob = prob
             
