@@ -25,14 +25,15 @@ class AudioSpeechPipeline:
         event_bus: EventBus,
         speech_cfg: Dict
     ):
+        self.sample_rate = speech_cfg.get("sample_rate")
         self.event_bus = event_bus
-        self.capture = AudioCapture(sample_rate=speech_cfg.get("sample_rate"),
+        self.capture = AudioCapture(sample_rate=self.sample_rate,
                                     chunk_size=speech_cfg.get("chunk_size"),
                                     buffer_seconds=speech_cfg.get("buffer_seconds"))
-        self.vad = VADDectector(sample_rate=speech_cfg.get("sample_rate"))
+        self.vad = VADDectector(sample_rate=self.sample_rate)
         self.turn_taker = TurnTaker(
             silence_threshold=speech_cfg.get("silence_threshold", 1.5),
-            sample_rate=speech_cfg.get("sample_rate", 16000),
+            sample_rate=self.sample_rate,
             vad_detector=self.vad
         )
         self._is_running = False
