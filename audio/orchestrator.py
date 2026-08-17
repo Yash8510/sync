@@ -14,6 +14,7 @@ from audio.capture import AudioCapture
 from audio.turn_taking import TurnTaker
 from audio.vad import VADDectector
 from core.event_bus import EventBus
+from speech.stt import STTEngine
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +37,7 @@ class AudioSpeechPipeline:
             sample_rate=self.sample_rate,
             vad_detector=self.vad
         )
+        self.stt = STTEngine(model_size=speech_cfg["stt_model"]["distil-large-v3.5"], device="cuda", compute_type="float32")
         self._is_running = False
 
         # thread-safe queue to pass audio chunk from callback func which is consumed by get_user_utterance()
@@ -123,7 +125,8 @@ class AudioSpeechPipeline:
         if len(combined_audio) > 0:
             # transcript audio to txt here
             print("speech detected & transcriptions in here")
-            return "dummy transcript"
+            text, _, _ = self.stt.transcribe(combined_audio)
+            return text
         else:
             return ""
 
