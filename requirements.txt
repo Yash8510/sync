@@ -1,0 +1,38 @@
+# ==============================================================================
+# S.Y.N.C. (Synthetic Neural Companion) - Dependency Requirements
+# ==============================================================================
+
+# --- Core Graphical User Interface ---
+PyQt6>=6.7.1
+PyQt6-Qt6>=6.7.3
+PyQt6_sip>=13.11.1
+
+# --- Audio Ingestion & Signal Processing ---
+sounddevice>=0.4.6
+soundfile>=0.14.0
+numpy>=1.24.3,<2.0.0
+scipy>=1.13.0
+
+# --- Voice Activity Detection (VAD) & Neural Models ---
+# Note: For GPU acceleration, install PyTorch with CUDA support first:
+# pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu121
+torch>=2.1.0
+torchaudio>=2.1.0
+silero-vad>=5.1
+
+# --- Speech-to-Text (STT) Engine ---
+faster-whisper>=1.2.1
+ctranslate2>=4.5.0
+huggingface-hub>=0.20.0
+
+# --- Text-to-Speech (TTS) & ONNX Runtime (Upcoming v0.2.0) ---
+onnxruntime>=1.16.0
+
+# --- Configuration & Logging ---
+PyYAML>=6.0.2
+
+# --- Diagnostic & Development Tools ---
+pandas>=2.0.0
+matplotlib>=3.7.0
+pytest>=8.0.0
+pytest-asyncio>=0.24.0

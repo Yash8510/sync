@@ -1,0 +1,42 @@
+# ==============================================================================
+# S.Y.N.C. (Synthetic Neural Companion) - Configuration Template
+# Copy this file to 'config/default.yaml' and customize settings for your setup.
+# ==============================================================================
+
+app:
+  name: "S.Y.N.C."
+  version: "0.1.0-alpha"
+  codename: "Resonance"
+
+logging:
+  level: "INFO"               # Log verbosity: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  file: "log/assistant.log"   # Path to persistent log file
+
+speech:
+  # --- Acoustic Ingestion Parameters ---
+  sample_rate: 16000          # Required 16 kHz sampling rate for Silero VAD & Whisper
+  chunk_size: 1024            # Buffer frame size (1024 samples = 64 ms per frame)
+  buffer_seconds: 5           # History length (seconds) preserved in ring buffer for visualizer
+  silence_threshold: 1.5      # Silence duration (seconds) required to finalize speech turn
+
+  # --- Speech-to-Text (STT) Model Zoo ---
+  # Specify standard Hugging Face model identifiers or local folder paths.
+  # S.Y.N.C. automatically checks 'models/stt/' for local cached snapshots first.
+  stt_model:
+    # Lightweight / Low VRAM (~400MB - 600MB):
+    "tiny": "Systran/faster-whisper-tiny"
+    "tiny-en": "Systran/faster-whisper-tiny.en"
+    "base": "Systran/faster-whisper-base"
+    "base-en": "Systran/faster-whisper-base.en"
+
+    # Balanced (~1.2GB VRAM):
+    "small": "Systran/faster-whisper-small"
+    "small-en": "Systran/faster-whisper-small.en"
+
+    # High Accuracy / Production Quality (~2.5GB - 3.0GB VRAM):
+    "distil-large-v3.5": "distil-whisper/distil-large-v3.5"
+    "large-v3-turbo": "mobiuslabsgmbh/faster-whisper-large-v3-turbo"
+
+  # --- Text-to-Speech (TTS) Synthesis (Phase 2) ---
+  piper_path: "bin/piper/piper.exe"
+  piper_model_path: "models/tts/en_US-amy-medium.onnx"

@@ -75,7 +75,7 @@ def main():
     # load config file
     config = load_config("config/default.yaml")
     config_logging(config.log_level, str(config.raw.get("logging").get("file")))
-    logger.info("=== Starting assistant application ===")
+    logger.info("=== Starting %s v%s (%s) ===", config.app_name, config.version, config.codename)
 
     # <----------loadup the important things first---------->
     # 1. Initialize EventBus
@@ -102,7 +102,8 @@ def main():
     # window setup and show
     window = MainWindow(
         event_bridge,
-        audio_capture=pipeline.capture
+        audio_capture=pipeline.capture,
+        title=f"{config.app_name} v{config.version}"
     )
     window.show()  # display window
     # <----------END---------->

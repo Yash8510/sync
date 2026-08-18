@@ -1,5 +1,50 @@
+# ==============================================================================
+# S.Y.N.C. Git Ignore Rules
+# ==============================================================================
+
+# --- Python Bytecode & Cache ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.pytest_cache/
+
+# --- Local Log Files ---
 *.log
-*__pycache__/
-*images/
-*models/
+log/
+
+# --- Environment & Secret Files ---
+.env
+.env.*
+*.env
+!.env.example
+
+# --- Virtual Environments ---
+venv/
+env/
+.venv/
+ENV/
+
+# --- IDE & Editor Settings ---
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# --- Model Checkpoints & Large Binaries (Keep models local) ---
+models/
+bin/
+*.onnx
+*.bin
+*.pt
+*.pth
+
+# --- Local Audio Recordings & Test Data ---
 ztest/data/
+*.wav
+*.mp3
+*.flac
+*.ogg
+
+# --- Temporary Output ---
+scratch/

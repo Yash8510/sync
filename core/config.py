@@ -14,13 +14,22 @@ class AppConfig:
     """Immutable application config wrapper"""
 
     raw: Dict[str, Any]
+    
     @property
     def app_name(self) -> str:
-        return str(self.raw.get("app", {}).get("name"))
+        return str(self.raw.get("app", {}).get("name", "S.Y.N.C."))
+    
+    @property
+    def version(self) -> str:
+        return str(self.raw.get("app", {}).get("version", "0.1.0-alpha"))
+
+    @property
+    def codename(self) -> str:
+        return str(self.raw.get("app", {}).get("codename", "Resonance"))
     
     @property
     def log_level(self) -> str:
-        return str(self.raw.get("logging").get("level"))
+        return str(self.raw.get("logging", {}).get("level", "INFO"))
 
 
 def load_config(path: str | Path) -> AppConfig:

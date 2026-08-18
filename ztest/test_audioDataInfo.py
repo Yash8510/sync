@@ -12,17 +12,17 @@ from speech.stt import STTEngine
 sample_rate = 16000
 chunk_size = 1024
 models = {
-    "tiny": "C:\\Users\\Yash\\Personal_space\\Projects\\TimePass\\assistant_bymyself\\models\\stt\\models--Systran--faster-whisper-tiny\\snapshots\\d90ca5fe260221311c53c58e660288d3deb8d356\\",
-    "tiny-en": "C:\\Users\\Yash\\Personal_space\\Projects\\TimePass\\assistant_bymyself\\models\\stt\\models--Systran--faster-whisper-tiny.en\\snapshots\\0d3d19a32d3338f10357c0889762bd8d64bbdeba\\",
-    "small": "C:\\Users\\Yash\\Personal_space\\Projects\\TimePass\\assistant_bymyself\\models\\stt\\models--Systran--faster-whisper-small\\snapshots\\536b0662742c02347bc0e980a01041f333bce120\\",
-    "small-en": "C:\\Users\\Yash\\Personal_space\\Projects\\TimePass\\assistant_bymyself\\models\\stt\\models--Systran--faster-whisper-small.en\\snapshots\\d1d751a5f8271d482d14ca55d9e2deeebbae577f\\",
-    "base-en": "C:\\Users\\Yash\\Personal_space\\Projects\\TimePass\\assistant_bymyself\\models\\stt\\models--Systran--faster-whisper-base.en\\snapshots\\3d3d5dee26484f91867d81cb899cfcf72b96be6c\\",
-    "base": "C:\\Users\\Yash\\Personal_space\\Projects\\TimePass\\assistant_bymyself\\models\\stt\\models--Systran--faster-whisper-base\\snapshots\\ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66\\",
-    "large-v3-turbo": "C:\\Users\\Yash\\Personal_space\\Projects\\TimePass\\assistant_bymyself\\models\\stt\\models--mobiuslabsgmbh--faster-whisper-large-v3-turbo\\snapshots\\0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf\\",
-    "distil-large-v3.5": "C:\\Users\\Yash\\Personal_space\\Projects\\TimePass\\assistant_bymyself\\models\\stt\\models--distil-whisper--distil-large-v3.5-ct2\\snapshots\\9793ccc07920e0f830e1dba0343efcdf0ef8c903\\"
+    "tiny": "Systran/faster-whisper-tiny",
+    "tiny-en": "Systran/faster-whisper-tiny.en",
+    "small": "Systran/faster-whisper-small",
+    "small-en": "Systran/faster-whisper-small.en",
+    "base-en": "Systran/faster-whisper-base.en",
+    "base": "Systran/faster-whisper-base",
+    "large-v3-turbo": "mobiuslabsgmbh/faster-whisper-large-v3-turbo",
+    "distil-large-v3.5": "distil-whisper/distil-large-v3.5"
 }
 model_path = models["tiny"]
-audio_path = "C:\\Users\\Yash\\Personal_space\\Projects\\TimePass\\assistant_bymyself\\ztest\\data\\test01_20s.wav"
+audio_path = "ztest/data/test01_20s.wav"
 vad = VADDectector(sample_rate=sample_rate)
 turn_taker = TurnTaker(silence_threshold=1.5, sample_rate=sample_rate, vad_detector=vad)
 stt_engine = STTEngine(model_size=model_path, device="cuda")

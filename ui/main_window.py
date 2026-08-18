@@ -30,7 +30,8 @@ class MainWindow(QMainWindow):
     def __init__(
         self,
         event_bridge: PyQtEventBridge,
-        audio_capture: AudioCapture
+        audio_capture: AudioCapture,
+        title: str = "S.Y.N.C."
     ) -> None:
         super().__init__()
         self.event_bridge = event_bridge
@@ -43,7 +44,7 @@ class MainWindow(QMainWindow):
         self.visualizer_timer.timeout.connect(self._update_waveform)
         self.visualizer_timer.start()  # Run continuously to keep the visualizer breathing while quiet
 
-        self.setWindowTitle("Assistant")  # window title
+        self.setWindowTitle(title)  # window title
         self.resize(900, 600)
         self.setMinimumSize(800, 550)  # min size to set window
         self.setStyleSheet(MAIN_WINDOW_STYLE)  # setting custom window styling
